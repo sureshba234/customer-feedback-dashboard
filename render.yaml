@@ -1,0 +1,19 @@
+{
+  "services": [
+    {
+      "type": "web_service",
+      "name": "feedback-backend",
+      "env": "docker",
+      "dockerfilePath": "backend/Dockerfile",
+      "plan": "free"
+    },
+    {
+      "type": "static_site",
+      "name": "feedback-frontend",
+      "env": "node",
+      "buildCommand": "npm install && npm run build",
+      "publishPath": "dist",
+      "plan": "free"
+    }
+  ]
+}

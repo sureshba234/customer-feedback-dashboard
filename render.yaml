@@ -5,7 +5,7 @@ services:
     dockerfilePath: backend/Dockerfile
     plan: free
 
-  - type: static
+  - type: web
     name: feedback-frontend
     env: node
     buildCommand: npm install && npm run build

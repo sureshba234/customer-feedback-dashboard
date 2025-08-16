@@ -1,1 +1,96 @@
-import React,{useState} from 'react';const API=import.meta.env.VITE_API_URL||'http://localhost:8080';export default function UploadForm(){const [product,setProduct]=useState('');const [text,setText]=useState('');const [msg,setMsg]=useState('');const handleAdd=async e=>{e.preventDefault();setMsg('');if(!product||!text){setMsg('Provide product and text');return;}try{const res=await fetch(`${API}/feedback`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({product,text})});const data=await res.json();if(res.ok){setMsg(`Saved: #${data.id} (${data.sentiment})`);setProduct('');setText('')}else setMsg(data.detail||'Failed');}catch(e){setMsg('Backend not reachable')} };const handleCSV=async e=>{const file=e.target.files?.[0];if(!file)return;setMsg('Uploading...');const form=new FormData();form.append('file',file);try{const res=await fetch(`${API}/feedback/bulk`,{method:'POST',body:form});const data=await res.json();if(res.ok)setMsg(`Inserted ${data.inserted} rows`);else setMsg(data.detail||'Failed');}catch(e){setMsg('Backend not reachable')} };return (<div style={{background:'#fff',padding:16,borderRadius:8}}><h2>Add Single</h2><form onSubmit={handleAdd} style={{display:'grid',gap:8,maxWidth:600}}><input placeholder='Product' value={product} onChange={e=>setProduct(e.target.value)}/><textarea placeholder='Feedback text' rows={4} value={text} onChange={e=>setText(e.target.value)}/><button type='submit'>Analyze & Save</button></form><h2 style={{marginTop:24}}>Upload CSV</h2><input type='file' accept='.csv' onChange={handleCSV}/>{msg&&<p style={{color:'#0366d6'}}>{msg}</p>}</div>); }
+import React, { useState } from 'react';
+
+// Use environment variable for API URL or fallback to localhost
+const API = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+export default function UploadForm() {
+  const [product, setProduct] = useState('');
+  const [text, setText] = useState('');
+  const [msg, setMsg] = useState('');
+
+  // Handler for adding a single feedback
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    setMsg('');
+
+    if (!product || !text) {
+      setMsg('Provide product and text');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/feedback`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product, text }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setMsg(`Saved: #${data.id} (${data.sentiment})`);
+        setProduct('');
+        setText('');
+      } else {
+        setMsg(data.detail || 'Failed');
+      }
+    } catch (e) {
+      setMsg('Backend not reachable');
+    }
+  };
+
+  // Handler for uploading a CSV file
+  const handleCSV = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setMsg('Uploading...');
+    const form = new FormData();
+    form.append('file', file);
+
+    try {
+      const res = await fetch(`${API}/feedback/bulk`, {
+        method: 'POST',
+        body: form,
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setMsg(`Inserted ${data.inserted} rows`);
+      } else {
+        setMsg(data.detail || 'Failed');
+      }
+    } catch (e) {
+      setMsg('Backend not reachable');
+    }
+  };
+
+  return (
+    <div style={{ background: '#fff', padding: 16, borderRadius: 8 }}>
+      <h2>Add Single</h2>
+      <form
+        onSubmit={handleAdd}
+        style={{ display: 'grid', gap: 8, maxWidth: 600 }}
+      >
+        <input
+          placeholder="Product"
+          value={product}
+          onChange={(e) => setProduct(e.target.value)}
+        />
+        <textarea
+          placeholder="Feedback text"
+          rows={4}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        <button type="submit">Analyze & Save</button>
+      </form>
+
+      <h2 style={{ marginTop: 24 }}>Upload CSV</h2>
+      <input type="file" accept=".csv" onChange={handleCSV} />
+
+      {msg && <p style={{ color: '#0366d6' }}>{msg}</p>}
+    </div>
+  );
+}
